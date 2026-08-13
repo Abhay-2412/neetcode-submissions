@@ -1,0 +1,44 @@
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        if (t.size() > s.size()) return "";
+
+        array<int, 128> t_freq{};
+        array<int, 128> window{};
+
+        int needed_matches = 0;
+        for (int i = 0; i < t.size(); i++) {
+            if (t_freq[t[i]] == 0) needed_matches++;
+            t_freq[t[i]]++;
+        }
+
+        int left = 0;
+        int matches = 0;
+        int smallest = s.size() + 1;
+        int minStart = 0;
+
+        for (int right = 0; right < s.size(); right++) {
+            if (t_freq[s[right]] != 0) {
+                window[s[right]]++;
+                if (window[s[right]] == t_freq[s[right]])
+                    matches++;
+            }
+
+            while (matches == needed_matches) {
+                if (right - left + 1 < smallest) {
+                    smallest = right - left + 1;
+                    minStart = left;
+                }
+
+                if (t_freq[s[left]] != 0) {
+                    if (window[s[left]] == t_freq[s[left]])
+                        matches--;
+                    window[s[left]]--;
+                }
+                left++;
+            }
+        }
+
+        return smallest > s.size() ? "" : s.substr(minStart, smallest);
+    }
+};
